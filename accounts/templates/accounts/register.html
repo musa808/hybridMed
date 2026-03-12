@@ -1,0 +1,46 @@
+{% extends "layout.html" %}
+
+{% block content %}
+<div style="max-width:400px; margin:auto; background:white; padding:30px; border-radius:10px; box-shadow:0 2px 10px rgba(0,0,0,0.1);">
+
+    <h2 style="text-align:center; margin-bottom:20px;">Register Account</h2>
+
+    {% if messages %}
+        {% for message in messages %}
+            <div style="color:green; margin-bottom:15px;">{{ message }}</div>
+        {% endfor %}
+    {% endif %}
+
+    <form method="post">
+        {% csrf_token %}
+
+        <h4>User Info</h4>
+        {% for field in user_form %}
+            <div style="margin-bottom: 15px;">
+                {{ field.label_tag }}<br>
+                {{ field }}
+                {% if field.errors %}
+                    <div style="color:red;">{{ field.errors }}</div>
+                {% endif %}
+            </div>
+        {% endfor %}
+
+        <h4>Profile Info</h4>
+        {% for field in profile_form %}
+            <div style="margin-bottom: 15px;">
+                {{ field.label_tag }}<br>
+                {{ field }}
+                {% if field.errors %}
+                    <div style="color:red;">{{ field.errors }}</div>
+                {% endif %}
+            </div>
+        {% endfor %}
+
+        <button type="submit" class="btn">Register</button>
+    </form>
+
+    <p style="margin-top:15px; text-align:center;">
+        Already have an account? <a href="{% url 'accounts:login' %}">Login</a>
+    </p>
+</div>
+{% endblock %}

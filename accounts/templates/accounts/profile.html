@@ -1,0 +1,18 @@
+{% extends "layout.html" %}
+
+{% block content %}
+<div style="max-width: 600px; margin: auto; background: white; padding: 30px; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.1);">
+    <h2 style="text-align:center; margin-bottom:20px;">My Profile</h2>
+
+    <p><strong>Username:</strong> {{ user.username }}</p>
+    <p><strong>Email:</strong> {{ user.email }}</p>
+    <p><strong>First Name:</strong> {{ user.first_name }}</p>
+    <p><strong>Last Name:</strong> {{ user.last_name }}</p>
+    <p><strong>Staff Status:</strong> {% if user.is_staff %}Yes{% else %}No{% endif %}</p>
+    <p><strong>Superuser:</strong> {% if user.is_superuser %}Yes{% else %}No{% endif %}</p>
+
+    <div style="margin-top:20px;">
+        <a href="{% url 'home_view' %}" class="btn">Back to Dashboard</a>
+    </div>
+</div>
+{% endblock %}

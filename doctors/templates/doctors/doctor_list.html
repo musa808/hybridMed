@@ -1,0 +1,58 @@
+{% extends "layout.html" %}
+{% block content %}
+
+<div style="max-width:1000px; margin:40px auto; padding:20px;">
+
+    <!-- Header -->
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
+        <h2 style="color:#2c3e50;">Doctors</h2>
+        <a href="{% url 'doctors:doctor_create' %}" 
+           style="background:#2980b9; color:white; padding:10px 15px; border-radius:6px; text-decoration:none;">➕ Add Doctor</a>
+    </div>
+
+    <!-- Doctors Table -->
+    <div style="overflow-x:auto;">
+        <table style="width:100%; border-collapse:collapse; box-shadow:0 2px 10px rgba(0,0,0,0.1);">
+            <thead>
+                <tr style="background:#3498db; color:white; text-align:left;">
+                    <th style="padding:12px;">Name</th>
+                    <th style="padding:12px;">Specialization</th>
+                    <th style="padding:12px;">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for doctor in doctors %}
+                <tr style="border-bottom:1px solid #ddd;">
+                    <td style="padding:12px;">{{ doctor.user }}</td>
+                    <td style="padding:12px;">{{ doctor.specialization }}</td>
+                    <td style="padding:12px;">
+                        <a href="{% url 'doctors:doctor_detail' doctor.id %}" 
+                           style="background:#8e44ad; color:white; padding:5px 10px; border-radius:4px; text-decoration:none; margin-right:5px;">View</a>
+                        <a href="{% url 'doctors:doctor_update' doctor.id %}" 
+                           style="background:#27ae60; color:white; padding:5px 10px; border-radius:4px; text-decoration:none; margin-right:5px;">Edit</a>
+                        <a href="{% url 'doctors:doctor_delete' doctor.id %}" 
+                           style="background:#c0392b; color:white; padding:5px 10px; border-radius:4px; text-decoration:none;">Delete</a>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="3" style="text-align:center; padding:15px; color:#7f8c8d;">No doctors found.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+</div>
+
+<!-- Hover effects -->
+<style>
+    table tbody tr:hover {
+        background-color: #f2f2f2;
+    }
+    a:hover {
+        opacity: 0.85;
+    }
+</style>
+
+{% endblock %}

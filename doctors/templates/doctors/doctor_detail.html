@@ -1,0 +1,28 @@
+{% extends "layout.html" %}
+{% block content %}
+
+<div style="max-width:600px; margin:40px auto; padding:30px; background:#fff; border-radius:10px; box-shadow:0 2px 12px rgba(0,0,0,0.1);">
+
+    <!-- Header -->
+    <h2 style="color:#2c3e50; margin-bottom:20px;">Doctor Details</h2>
+
+    <!-- Doctor Info -->
+    <div style="line-height:1.8; font-size:16px; color:#34495e;">
+        <p><strong>Name:</strong> {{ doctor.name }}</p>
+        <p><strong>Email:</strong> {{ doctor.email }}</p>
+        <p><strong>Specialization:</strong> {{ doctor.specialization }}</p>
+    </div>
+
+    <!-- Actions -->
+    <div style="margin-top:25px;">
+        <a href="{% url 'doctors:doctor_list' %}" 
+           style="background:#2980b9; color:white; padding:10px 15px; border-radius:6px; text-decoration:none;">⬅ Back to Doctors</a>
+        <a href="{% url 'doctors:doctor_update' doctor.id %}" 
+           style="background:#27ae60; color:white; padding:10px 15px; border-radius:6px; text-decoration:none; margin-left:10px;">✏ Edit</a>
+        <a href="{% url 'doctors:doctor_delete' doctor.id %}" 
+           style="background:#c0392b; color:white; padding:10px 15px; border-radius:6px; text-decoration:none; margin-left:10px;">🗑 Delete</a>
+    </div>
+
+</div>
+
+{% endblock %}

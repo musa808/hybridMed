@@ -1,0 +1,69 @@
+{% extends "layout.html" %}
+
+{% block content %}
+
+<div style="max-width:1200px; margin:40px auto; padding:20px;">
+
+    <!-- Header -->
+    <header style="text-align:center; margin-bottom:40px;">
+        <h1 style="font-size:2.5rem; color:#2c3e50; margin-bottom:10px;">Hybrid Medical Consultancy Dashboard</h1>
+        <p style="font-size:1.1rem; color:#7f8c8d;">Manage patients, doctors, appointments, records, and consultations all in one place.</p>
+        <hr style="margin-top:20px; border:0; height:2px; background-color:#3498db; width:80px; margin-left:auto; margin-right:auto;">
+    </header>
+
+    <!-- Dashboard Cards -->
+    <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap:25px;">
+
+        <!-- Patients -->
+        <div style="background:#fff; border-radius:12px; padding:25px; box-shadow:0 4px 15px rgba(0,0,0,0.1); text-align:center; transition: transform 0.2s;">
+            <h3 style="color:#2980b9;">Patients</h3>
+            <p style="color:#7f8c8d;">Manage registered patients</p>
+            <a href="{% url 'patients:patient_list' %}" style="display:inline-block; margin-top:10px; padding:8px 15px; background:#2980b9; color:white; border-radius:6px; text-decoration:none;">View Patients</a>
+        </div>
+
+        <!-- Doctors -->
+        <div style="background:#fff; border-radius:12px; padding:25px; box-shadow:0 4px 15px rgba(0,0,0,0.1); text-align:center; transition: transform 0.2s;">
+            <h3 style="color:#27ae60;">Doctors</h3>
+            <p style="color:#7f8c8d;">Manage medical staff</p>
+            <a href="{% url 'doctors:doctor_list' %}" style="display:inline-block; margin-top:10px; padding:8px 15px; background:#27ae60; color:white; border-radius:6px; text-decoration:none;">View Doctors</a>
+        </div>
+
+        <!-- Appointments -->
+        <div style="background:#fff; border-radius:12px; padding:25px; box-shadow:0 4px 15px rgba(0,0,0,0.1); text-align:center; transition: transform 0.2s;">
+            <h3 style="color:#e67e22;">Appointments</h3>
+            <p style="color:#7f8c8d;">Schedule and manage bookings</p>
+            <a href="{% url 'appointment:appointment_list' %}" style="display:inline-block; margin-top:10px; padding:8px 15px; background:#e67e22; color:white; border-radius:6px; text-decoration:none;">View Appointments</a>
+        </div>
+
+        <!-- Records -->
+        <div style="background:#fff; border-radius:12px; padding:25px; box-shadow:0 4px 15px rgba(0,0,0,0.1); text-align:center; transition: transform 0.2s;">
+            <h3 style="color:#8e44ad;">Medical Records</h3>
+            <p style="color:#7f8c8d;">Patient medical history</p>
+            <a href="{% url 'records:record_list' %}" style="display:inline-block; margin-top:10px; padding:8px 15px; background:#8e44ad; color:white; border-radius:6px; text-decoration:none;">View Records</a>
+        </div>
+
+        <!-- Consultations -->
+        <div style="background:#fff; border-radius:12px; padding:25px; box-shadow:0 4px 15px rgba(0,0,0,0.1); text-align:center; transition: transform 0.2s;">
+            <h3 style="color:#c0392b;">Consultations</h3>
+            <p style="color:#7f8c8d;">Doctor consultations</p>
+            <a href="{% url 'consultations:consultation_list' %}" style="display:inline-block; margin-top:10px; padding:8px 15px; background:#c0392b; color:white; border-radius:6px; text-decoration:none;">View Consultations</a>
+        </div>
+
+    </div>
+
+    <!-- Footer Message -->
+    <footer style="text-align:center; margin-top:50px; color:#7f8c8d; font-size:1rem;">
+        <p>Welcome to your Hybrid Medical Consultancy System. Streamline healthcare management efficiently.</p>
+    </footer>
+
+</div>
+
+<!-- Hover Animation -->
+<style>
+    div[style*="box-shadow"]:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+    }
+</style>
+
+{% endblock %}
