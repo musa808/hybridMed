@@ -1,0 +1,29 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<h3>Patient Symptom Records</h3>
+
+<table>
+    <thead>
+        <tr>
+            <th>Patient</th>
+            <th>Symptoms</th>
+            <th>AI Diagnosis</th>
+            <th>Date</th>
+        </tr>
+    </thead>
+
+    <tbody>
+        {% for record in records %}
+        <tr>
+            <td>{{ record.patient.username }}</td>
+            <td>{{ record.symptoms }}</td>
+            <td>{{ record.ai_response }}</td>
+            <td>{{ record.created_at }}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+{% endblock %}

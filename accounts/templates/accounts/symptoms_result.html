@@ -1,0 +1,15 @@
+{% extends 'layout.html' %}
+
+{% block content %}
+<h2>AI Symptom Checker</h2>
+<form method="post">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit">Check Symptoms</button>
+</form>
+
+{% if diagnosis %}
+    <h3>AI Analysis:</h3>
+    <p>{{ diagnosis }}</p>
+{% endif %}
+{% endblock %}

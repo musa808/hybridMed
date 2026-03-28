@@ -6,17 +6,34 @@ from .forms import AppointmentForm
 @login_required
 def appointment_list(request):
     appointments = Appointment.objects.all()
-    return render(request, 'appointment/appointment_list.html', {'appointment': appointments})
+    return render(request, 'appointment/appointment_list.html', {
+        'appointments': appointments
+    })
 
 
+from django.shortcuts import render, redirect
+from .forms import AppointmentForm
+from accounts.models import Payment
 @login_required
 def appointment_create(request):
     form = AppointmentForm(request.POST or None)
     if form.is_valid():
-        form.save()
-        return redirect('appointment:appointment_list')
-    return render(request, 'appointment/appointment_form.html', {'form': form})
+        appointment = form.save(commit=False)
+        appointment.patient = request.user  # attach logged-in patient
+        appointment.save()
 
+        # create a pending payment
+        payment = Payment.objects.create(
+            user=request.user,
+            appointment=appointment,
+            amount=appointment.fee,  # make sure your Appointment model has a 'fee' field
+            status='pending',
+        )
+
+        # redirect to the payment page immediately
+        return redirect('accounts:payment_page', payment_id=payment.id)
+
+    return render(request, 'appointment/appointment_form.html', {'form': form})
 
 @login_required
 def appointment_update(request, pk):

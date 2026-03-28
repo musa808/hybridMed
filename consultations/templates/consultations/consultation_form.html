@@ -1,12 +1,45 @@
 {% extends "layout.html" %}
+
 {% block content %}
 
-<h2>Consultation Form</h2>
+<h2>Book Consultation</h2>
 
 <form method="post">
     {% csrf_token %}
     {{ form.as_p }}
-    <button type="submit" class="btn-submit">Save</button>
+
+    <!-- Payment Method -->
+    <label for="payment_method">Payment Method:</label>
+    <select name="payment_method" id="payment_method">
+        <option value="cash">Cash</option>
+        <option value="mpesa">Mpesa</option>
+        <option value="stripe">Stripe</option>
+        <option value="insurance">Insurance</option>
+    </select>
+
+    <!-- Insurance Fields (hidden by default) -->
+    <div id="insurance_fields" style="display:none; margin-top:10px;">
+        <label for="insurance_provider">Insurance Provider:</label>
+        <input type="text" name="insurance_provider" id="insurance_provider" placeholder="e.g., SHA">
+
+        <label for="insurance_number">Insurance Number:</label>
+        <input type="text" name="insurance_number" id="insurance_number" placeholder="Policy Number">
+    </div>
+
+    <button type="submit">Save & Pay</button>
 </form>
+
+<script>
+    const paymentSelect = document.getElementById('payment_method');
+    const insuranceFields = document.getElementById('insurance_fields');
+
+    paymentSelect.addEventListener('change', function() {
+        if (this.value === 'insurance') {
+            insuranceFields.style.display = 'block';
+        } else {
+            insuranceFields.style.display = 'none';
+        }
+    });
+</script>
 
 {% endblock %}

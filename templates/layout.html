@@ -6,13 +6,16 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
     <style>
-        /* Reset & Fonts */
+        /* Global Reset & Font */
         * {
             margin: 0; padding: 0; box-sizing: border-box;
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
+
         body {
-            display: flex; min-height: 100vh; background: #f4f6f9;
+            display: flex;
+            min-height: 100vh;
+            background: #f4f6f9;
         }
 
         /* Sidebar */
@@ -32,7 +35,6 @@
             padding: 20px 0;
             font-size: 22px;
             font-weight: bold;
-            letter-spacing: 1px;
             background: #111827;
             margin-bottom: 15px;
         }
@@ -49,10 +51,6 @@
             margin: 4px 10px;
         }
 
-        .sidebar a i {
-            margin-right: 10px;
-        }
-
         .sidebar a:hover {
             background: #2563eb;
             color: #fff;
@@ -64,7 +62,13 @@
             margin: 15px 0;
         }
 
-        /* Main content */
+        /* ✅ NEW: Active link highlight (does not affect existing behavior) */
+        .sidebar a.active {
+            background: #2563eb;
+            color: #fff;
+        }
+
+        /* Main Content */
         .main {
             margin-left: 260px;
             width: calc(100% - 260px);
@@ -81,7 +85,6 @@
             justify-content: space-between;
             padding: 0 25px;
             box-shadow: 0 2px 8px rgba(0,0,0,0.08);
-            z-index: 1000;
         }
 
         .navbar h3 {
@@ -89,7 +92,14 @@
             font-weight: 600;
         }
 
-        .navbar .user a {
+        .user {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            position: relative;
+        }
+
+        .user a {
             margin-left: 12px;
             text-decoration: none;
             font-weight: 600;
@@ -99,223 +109,261 @@
             transition: all 0.3s ease;
         }
 
-        .navbar .user a:hover {
+        .user a:hover {
             background: #2563eb;
             color: white;
         }
 
+        /* Notifications & Messages */
+        .icon-box {
+            position: relative;
+            cursor: pointer;
+        }
+
+        .badge {
+            position: absolute;
+            top: -6px;
+            right: -8px;
+            background: red;
+            color: white;
+            border-radius: 50%;
+            font-size: 11px;
+            padding: 2px 6px;
+        }
+
+        .dropdown {
+            display: none;
+            position: absolute;
+            right: 0;
+            top: 35px;
+            background: white;
+            width: 300px;
+            border-radius: 8px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+            max-height: 300px;
+            overflow-y: auto;
+            z-index: 100;
+        }
+
+        .dropdown div {
+            padding: 10px;
+            border-bottom: 1px solid #eee;
+            font-size: 14px;
+        }
+
+        .dropdown div:hover {
+            background: #f1f5f9;
+        }
+
+        .icon-box:hover .dropdown {
+            display: block;
+        }
+
+        /* Page Content */
         .content {
             padding: 30px;
             background: #f4f6f9;
             flex: 1;
         }
 
-        /* Form container */
-        .form-container {
+        /* ✅ FORM STYLING (RESTORED + IMPROVED) */
+        form {
             max-width: 600px;
-            margin: auto;
             background: white;
-            padding: 30px;
+            padding: 25px;
             border-radius: 12px;
-            box-shadow: 0 8px 20px rgba(0,0,0,0.05);
-        }
-
-        .form-container h2 {
-            text-align: center;
-            margin-bottom: 25px;
-            color: #1e293b;
-            font-size: 24px;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.06);
         }
 
         form label {
             font-weight: 600;
-            margin-top: 12px;
             display: block;
-            color: #374151;
-        }
-
-        form input, form select, form textarea {
-            width: 100%;
-            padding: 12px;
-            margin-top: 6px;
-            border-radius: 8px;
-            border: 1px solid #d1d5db;
-            font-size: 14px;
-            transition: all 0.3s ease;
-        }
-
-        form input:focus, form select:focus, form textarea:focus {
-            border-color: #2563eb;
-            outline: none;
-            box-shadow: 0 0 0 2px rgba(37,99,235,0.2);
-        }
-
-        .btn-submit {
-            background: #2563eb;
-            color: white;
-            padding: 12px;
-            border: none;
-            border-radius: 8px;
-            margin-top: 20px;
-            width: 100%;
-            font-size: 16px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-
-        .btn-submit:hover {
-            background: #1d4ed8;
-            transform: translateY(-2px);
-        }
-
-        /* Tables */
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            background: white;
-            margin-top: 20px;
-            border-radius: 10px;
-            overflow: hidden;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
-        }
-
-        table th, table td {
-            padding: 14px;
-            border-bottom: 1px solid #e5e7eb;
-            text-align: left;
-            font-size: 14px;
-        }
-
-        table th {
-            background-color: #f3f4f6;
+            margin-bottom: 6px;
             color: #1e293b;
         }
 
-        table tr:hover {
-            background-color: #e0f2fe;
-            transition: all 0.3s ease;
-        }
-        /* Form Submit Button */
-.btn-submit {
-    background-color: #2563eb;   /* Bright blue */
-    color: white;
-    padding: 14px 0;             /* Taller button */
-    border: none;
-    border-radius: 8px;
-    font-size: 16px;             /* Larger text */
-    font-weight: 600;
-    cursor: pointer;
-    width: 26%;                 /* Full-width like your form inputs */
-    margin-top: 20px;
-    transition: all 0.3s ease;
-}
-
-.btn-submit:hover {
-    background-color: #1d4ed8;   /* Darker blue on hover */
-    transform: translateY(-2px); /* Slight lift for effect */
-}
-
-        /* Buttons inside table */
-        .btn {
-            padding: 8px 14px;
-            background-color: #2563eb;
-            border: none;
-            color: white;
-            border-radius: 6px;
-            cursor: pointer;
+        form textarea,
+        form input,
+        form select {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #cbd5e1;
+            border-radius: 8px;
+            margin-bottom: 15px;
             font-size: 14px;
-            transition: all 0.3s ease;
+            transition: 0.2s;
+        }
+
+        form textarea:focus,
+        form input:focus,
+        form select:focus {
+            outline: none;
+            border-color: #2563eb;
+            box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.1);
+        }
+
+        form button {
+            background: #16a34a;
+            color: white;
+            padding: 12px;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            width: 100%;
+            transition: 0.3s;
+        }
+
+        form button:hover {
+            background: #15803d;
+        }
+
+        /* Result Box */
+        .result-box {
+            margin-top: 20px;
+            padding: 15px;
+            background: #e0f2fe;
+            border-left: 5px solid #0284c7;
+            border-radius: 6px;
+        }
+
+        /* ✅ NEW: Google Meet Button Style */
+        .meet-btn {
+            display: inline-block;
+            background: #dc2626;
+            color: white;
+            padding: 10px 16px;
+            border-radius: 8px;
             text-decoration: none;
+            font-weight: 600;
+            transition: 0.3s;
         }
 
-        .btn:hover {
-            background-color: #1d4ed8;
-            transform: translateY(-1px);
-        }
-
-        /* Responsive */
-        @media(max-width:768px){
-            .sidebar {width:220px;}
-            .main {margin-left:220px;}
-        }
-
-        /* Scrollbar for sidebar */
-        .sidebar::-webkit-scrollbar {
-            width: 6px;
-        }
-
-        .sidebar::-webkit-scrollbar-thumb {
-            background: #2563eb;
-            border-radius: 3px;
+        .meet-btn:hover {
+            background: #b91c1c;
         }
     </style>
 </head>
+
 <body>
 
-    <!-- Sidebar -->
-    <div class="sidebar">
-        <h2>Medical System</h2>
+<!-- Sidebar -->
+<div class="sidebar">
+    <h2>Medical System</h2>
 
-        <!-- Dashboard -->
-        <a href="{% url 'home_view' %}"><i>🏠</i> Home</a>
-        <hr>
+    <a href="{% url 'home_view' %}">🏠 Home</a>
+    <hr>
 
-        <!-- Patients -->
-        <a href="{% url 'patients:patient_list' %}"><i>👤</i> Patients</a>
-        <a href="{% url 'patients:patient_create' %}"><i>➕</i> Register Patient</a>
+    <a href="{% url 'patients:patient_list' %}">👤 Patients</a>
+    <a href="{% url 'patients:patient_create' %}">➕ Register Patient</a>
 
-        <!-- Doctors -->
-        <a href="{% url 'doctors:doctor_list' %}"><i>🩺</i> Doctors</a>
-        <a href="{% url 'doctors:doctor_create' %}"><i>➕</i> Register Doctor</a>
+    <a href="{% url 'doctors:doctor_list' %}">🩺 Doctors</a>
+    <a href="{% url 'doctors:doctor_create' %}">➕ Register Doctor</a>
 
-        <!-- Appointments -->
-        <a href="{% url 'appointment:appointment_list' %}"><i>📅</i> Appointments</a>
-        <a href="{% url 'appointment:appointment_create' %}"><i>➕</i> Schedule Appointment</a>
+    <a href="{% url 'appointment:appointment_list' %}">📅 Appointments</a>
+    <a href="{% url 'appointment:appointment_create' %}">➕ Schedule Appointment</a>
 
-        <!-- Consultations -->
-        <a href="{% url 'consultations:consultation_list' %}"><i>💬</i> Consultations</a>
-        <a href="{% url 'consultations:consultation_create' %}"><i>➕</i> Add Consultation</a>
+    <a href="{% url 'consultations:consultation_list' %}">💬 Consultations</a>
+    <a href="{% url 'consultations:consultation_create' %}">➕ Add Consultation</a>
 
-        <!-- Records -->
-        <a href="{% url 'records:record_list' %}"><i>📄</i> Records</a>
-        <a href="{% url 'records:record_create' %}"><i>➕</i> Add Record</a>
+    <a href="{% url 'records:record_list' %}">📄 Records</a>
+    <a href="{% url 'records:record_create' %}">➕ Add Record</a>
+    <a href="{% url 'accounts:records_dashboard' %}">📊 Records Dashboard</a>
 
-        <hr>
+    <hr>
 
-        <!-- Admin Dashboard -->
-        {% if request.user.is_superuser %}
-            <a href="{% url 'appointment:admin_dashboard' %}"><i>⚙</i> Admin Dashboard</a>
+    {% if user.is_authenticated %}
+    <a href="{% url 'accounts:ai_symptom_checker' %}" style="background:#16a34a; color:white;">
+        🧠 AI Symptom Checker
+    </a>
+    {% endif %}
+
+    <hr>
+
+    {% if request.user.is_superuser %}
+        <a href="{% url 'appointment:admin_dashboard' %}">⚙ Admin Dashboard</a>
+    {% endif %}
+
+    <hr>
+    <a href="{% url 'about_view' %}">ℹ About</a>
+</div>
+
+<!-- Main -->
+<div class="main">
+
+    <!-- Navbar -->
+    <div class="navbar">
+        <h3>Hybrid Medical Consultancy</h3>
+
+        <div class="user">
+            {% if user.is_authenticated %}
+
+                <!-- Notifications -->
+                <div class="icon-box">
+                    🔔
+                    {% if unread_notifications_count > 0 %}
+                        <span class="badge">{{ unread_notifications_count }}</span>
+                    {% endif %}
+
+                    <div class="dropdown">
+                        {% for note in notifications %}
+                            <div>{{ note.title }}</div>
+                        {% empty %}
+                            <div>No notifications</div>
+                        {% endfor %}
+                    </div>
+                </div>
+
+                <!-- Messages -->
+                <div class="icon-box">
+                    💬
+                    {% if unread_messages_count > 0 %}
+                        <span class="badge">{{ unread_messages_count }}</span>
+                    {% endif %}
+
+                    <div class="dropdown">
+                        {% for msg in messages %}
+                            <div><strong>{{ msg.sender }}</strong>: {{ msg.subject }}</div>
+                        {% empty %}
+                            <div>No messages</div>
+                        {% endfor %}
+                    </div>
+                </div>
+
+                <span>👤 {{ user.username }}</span>
+                <a href="{% url 'accounts:logout' %}">Logout</a>
+
+            {% else %}
+                <a href="{% url 'accounts:login' %}">Login</a>
+                <a href="{% url 'accounts:register' %}">Register</a>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Content -->
+    <div class="content">
+
+        <!-- ✅ NEW: Django Messages Display -->
+        {% if messages %}
+            {% for message in messages %}
+                <div style="
+                    padding:12px;
+                    margin-bottom:15px;
+                    border-radius:6px;
+                    background:#d1fae5;
+                    color:#065f46;
+                    font-weight:600;
+                ">
+                    {{ message }}
+                </div>
+            {% endfor %}
         {% endif %}
 
-        <hr>
-        <a href="{% url 'about_view' %}"><i>ℹ</i> About</a>
+        {% block content %}
+        {% endblock %}
     </div>
 
-    <!-- Main -->
-    <div class="main">
-
-        <!-- Navbar -->
-        <div class="navbar">
-            <h3>Hybrid Medical Consultancy</h3>
-            <div class="user">
-                {% if user.is_authenticated %}
-                    <span>👤 {{ user.username }}</span>
-                    <a href="{% url 'accounts:logout' %}">Logout</a>
-                {% else %}
-                    <a href="{% url 'accounts:login' %}">Login</a>
-                    <a href="{% url 'accounts:register' %}">Register</a>
-                {% endif %}
-            </div>
-        </div>
-
-        <!-- Page Content -->
-        <div class="content">
-            {% block content %}
-            {% endblock %}
-        </div>
-
-    </div>
+</div>
 
 </body>
 </html>

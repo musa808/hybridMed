@@ -2,8 +2,10 @@ from django.db import models
 from django.contrib.auth.models import User
 
 
-class Consultation(models.Model):
+# consultations/models.py
 
+
+class Consultation(models.Model):
     CONSULTATION_TYPE = (
         ('online', 'Online'),
         ('physical', 'Physical Visit'),
@@ -43,6 +45,13 @@ class Consultation(models.Model):
         null=True
     )  # Only for online consultations
 
+    fee = models.DecimalField(
+        max_digits=10,
+        decimal_places=2,
+        default=0.00,
+        help_text="Set the consultation fee"
+    )
+
     status = models.CharField(
         max_length=20,
         choices=STATUS_CHOICES,
@@ -53,3 +62,17 @@ class Consultation(models.Model):
 
     def __str__(self):
         return f"{self.patient.username} - {self.doctor.username} ({self.status})"
+# consultations/models.py
+from django.db import models
+from appointment.models import Appointment
+from doctors.models import Doctor
+from patients.models import Patient
+
+class ConsultationFee(models.Model):
+    consultation = models.ForeignKey('Consultation', on_delete=models.CASCADE)  # link to consultation
+    amount = models.DecimalField(max_digits=10, decimal_places=2)
+    status = models.CharField(max_length=20, default='pending')
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"Fee for {self.consultation} - {self.amount} ({self.status})"

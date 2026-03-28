@@ -1,0 +1,60 @@
+{% extends "layout.html" %}
+
+{% block content %}
+<div class="inbox-container">
+
+    <h2>Inbox</h2>
+
+    {% if messages %}
+        <ul class="messages-list">
+            {% for message in messages %}
+                <li class="message {% if not message.read %}unread{% endif %}">
+                    <p class="message-sender"><strong>From:</strong> {{ message.sender.username }}</p>
+                    <p class="message-subject"><strong>Subject:</strong> {{ message.subject }}</p>
+                    <p class="message-body">{{ message.body }}</p>
+                    <small class="message-time">{{ message.created_at|date:"M d, Y H:i" }}</small>
+                </li>
+            {% endfor %}
+        </ul>
+    {% else %}
+        <p>No messages found.</p>
+    {% endif %}
+
+</div>
+
+<style>
+.inbox-container {
+    max-width: 800px;
+    margin: 50px auto;
+    padding: 20px;
+    font-family: Arial, sans-serif;
+}
+
+.messages-list {
+    list-style: none;
+    padding: 0;
+}
+
+.message {
+    margin-bottom: 15px;
+    padding: 15px;
+    border-radius: 5px;
+    background: #fff;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+}
+
+.message.unread {
+    background: #e0f7fa;
+}
+
+.message-sender,
+.message-subject,
+.message-body {
+    margin: 0 0 5px 0;
+}
+
+.message-time {
+    color: #555;
+}
+</style>
+{% endblock %}

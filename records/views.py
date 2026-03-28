@@ -34,3 +34,4 @@ def record_delete(request, pk):
     record = get_object_or_404(MedicalRecord, pk=pk)
     record.delete()
     return redirect('records:record_list')
+

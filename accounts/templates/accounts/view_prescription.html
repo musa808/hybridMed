@@ -1,0 +1,85 @@
+{% extends "layout.html" %}
+
+{% block content %}
+
+<div style="max-width:850px; margin:40px auto;">
+
+    <div style="background:white; padding:25px; border-radius:10px; box-shadow:0 2px 12px rgba(0,0,0,0.1);">
+
+        {% if prescription %}
+
+            <!-- Header -->
+            <div style="display:flex; justify-content:space-between; align-items:center;">
+                <h2 style="color:#2c3e50;">💊 Prescription</h2>
+                <span style="color:#7f8c8d;">{{ prescription.created_at|date:"M d, Y H:i" }}</span>
+            </div>
+
+            <hr style="margin:20px 0;">
+
+            <!-- Patient Info -->
+            <p><strong>Patient:</strong> {{ prescription.patient }}</p>
+            <p><strong>Doctor:</strong> {{ prescription.doctor }}</p>
+
+            <hr style="margin:20px 0;">
+
+            <!-- Medicines -->
+            <h3 style="color:#16a085;">🧾 Medicines</h3>
+            <div style="background:#f9f9f9; padding:15px; border-radius:6px; margin-top:10px;">
+                {{ prescription.medicines|linebreaks }}
+            </div>
+
+            <!-- Notes -->
+            {% if prescription.notes %}
+            <h3 style="color:#2980b9; margin-top:20px;">📝 Doctor Notes</h3>
+            <div style="background:#f4f6f9; padding:15px; border-radius:6px;">
+                {{ prescription.notes|linebreaks }}
+            </div>
+            {% endif %}
+
+            <!-- Actions -->
+            <div style="margin-top:30px; display:flex; flex-wrap:wrap; gap:10px;">
+
+                <!-- Back -->
+                <a href="{% url 'consultations:consultation_list' %}" 
+                   style="background:#7f8c8d; color:white; padding:8px 12px; border-radius:5px; text-decoration:none;">
+                   ⬅ Back
+                </a>
+
+                <!-- Edit (Doctor Only) -->
+                {% if user == prescription.doctor %}
+                <a href="{% url 'accounts:create_prescription' prescription.consultation.id %}" 
+                   style="background:#27ae60; color:white; padding:8px 12px; border-radius:5px; text-decoration:none;">
+                   ✏ Edit
+                </a>
+                {% endif %}
+
+                <!-- Download (Optional - if you add later) -->
+                {% if prescription.consultation.payment and prescription.consultation.payment.is_paid %}
+                <a href="{% url 'accounts:download_receipt' prescription.consultation.payment.id %}" 
+                   style="background:#2ecc71; color:white; padding:8px 12px; border-radius:5px; text-decoration:none;">
+                   ⬇ Receipt
+                </a>
+                {% endif %}
+
+            </div>
+
+        {% else %}
+
+            <!-- No Prescription -->
+            <div style="text-align:center; padding:40px;">
+                <h3 style="color:#e74c3c;">No Prescription Yet</h3>
+                <p style="color:#7f8c8d;">The doctor has not added a prescription for this consultation.</p>
+
+                <a href="{% url 'consultations:consultation_list' %}" 
+                   style="background:#3498db; color:white; padding:10px 15px; border-radius:5px; text-decoration:none;">
+                   ⬅ Back to Consultations
+                </a>
+            </div>
+
+        {% endif %}
+
+    </div>
+
+</div>
+
+{% endblock %}

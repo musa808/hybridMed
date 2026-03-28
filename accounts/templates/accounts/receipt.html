@@ -1,0 +1,51 @@
+{% extends "layout.html" %}
+
+{% block content %}
+
+<h2 style="text-align:center;">🏥 {{ hospital_name|default:"Your Hospital Name" }}</h2>
+
+<div style="text-align:center; margin-bottom:20px;">
+    <small>Official Payment Receipt</small>
+</div>
+
+{% if receipt %}
+
+<div style="max-width:650px; margin:auto; background:white; padding:30px; border-radius:12px; box-shadow:0 8px 20px rgba(0,0,0,0.06);">
+
+    <p><strong>Receipt No:</strong> {{ receipt.receipt_number }}</p>
+
+    <p><strong>Patient:</strong> {{ receipt.payment.user.username }}</p>
+
+    <p><strong>Amount:</strong> KES {{ receipt.payment.amount }}</p>
+
+    <p><strong>Method:</strong> {{ receipt.payment.payment_method|title }}</p>
+
+    <p><strong>Status:</strong> {{ receipt.payment.status|title }}</p>
+
+    <p><strong>Date:</strong> {{ receipt.issued_at }}</p>
+
+    <hr style="margin:20px 0;">
+
+    <div style="display:flex; justify-content:space-between; margin-top:40px;">
+
+        <!-- Signature -->
+        <div style="text-align:center;">
+            <img src="{{ signature_url }}" alt="Signature" style="height:60px;"><br>
+            <small>Authorized Signature</small>
+        </div>
+
+        <!-- Stamp -->
+        <div style="text-align:center;">
+            <img src="{{ stamp_url }}" alt="Stamp" style="height:80px;"><br>
+            <small>Official Stamp</small>
+        </div>
+
+    </div>
+
+</div>
+
+{% else %}
+    <p style="color:red;">Receipt not found.</p>
+{% endif %}
+
+{% endblock %}

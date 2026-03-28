@@ -1,0 +1,9 @@
+{% extends 'layout.html' %}
+{% block content %}
+<h2>Export Symptom Records</h2>
+
+<div class="export-buttons" style="margin-top: 20px;">
+    <a href="{% url 'accounts:export_excel' %}" class="btn-export">Export to Excel</a>
+    <a href="{% url 'accounts:export_pdf' %}" class="btn-export">Export to PDF</a>
+</div>
+{% endblock %}

@@ -6,6 +6,14 @@ class Patient(models.Model):
     phone=models.IntegerField(null=True)
     age=models.IntegerField()
     medical_history=models.TextField()
+    insurance = models.ForeignKey(
+        'accounts.Insurance',
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True
+    )
+
+    insurance_number = models.CharField(max_length=100, blank=True, null=True)
     
 
     def __str__(self):

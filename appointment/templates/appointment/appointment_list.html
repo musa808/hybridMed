@@ -6,54 +6,144 @@
     <!-- Header -->
     <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
         <h2 style="color:#2c3e50;">Appointments</h2>
+
         <a href="{% url 'appointment:appointment_create' %}" 
-           style="background:#2980b9; color:white; padding:10px 15px; border-radius:6px; text-decoration:none;">➕ Add Appointment</a>
+           style="background:#2980b9; color:white; padding:10px 15px; border-radius:6px; text-decoration:none;">
+           ➕ Add Appointment
+        </a>
     </div>
 
-    <!-- Appointments Table -->
+    <!-- Table -->
     <div style="overflow-x:auto;">
         <table style="width:100%; border-collapse:collapse; box-shadow:0 2px 10px rgba(0,0,0,0.1);">
+
             <thead>
                 <tr style="background:#3498db; color:white; text-align:left;">
                     <th style="padding:12px;">Patient</th>
                     <th style="padding:12px;">Doctor</th>
                     <th style="padding:12px;">Date</th>
                     <th style="padding:12px;">Time</th>
+                    <th style="padding:12px;">Status</th>
                     <th style="padding:12px;">Actions</th>
                 </tr>
             </thead>
+
             <tbody>
-                {% for appointment in appointment %}
+                {% for appointment in appointments %}
                 <tr style="border-bottom:1px solid #ddd;">
-                    <td style="padding:12px;">{{ appointment.patient }}</td>
-                    <td style="padding:12px;">{{ appointment.doctor }}</td>
-                    <td style="padding:12px;">{{ appointment.appointment_date }}</td>
-                    <td style="padding:12px;">{{ appointment.appointment_time }}</td>
-                    <td style="padding:12px;">
-                        <a href="{% url 'appointment:appointment_update' appointment.id %}" 
-                           style="background:#27ae60; color:white; padding:5px 10px; border-radius:4px; text-decoration:none; margin-right:5px;">Edit</a>
-                        <a href="{% url 'appointment:appointment_delete' appointment.id %}" 
-                           style="background:#c0392b; color:white; padding:5px 10px; border-radius:4px; text-decoration:none;">Delete</a>
+
+                    <td data-label="Patient" style="padding:12px;">
+                        {{ appointment.patient }}
                     </td>
+
+                    <td data-label="Doctor" style="padding:12px;">
+                        {{ appointment.doctor }}
+                    </td>
+
+                    <td data-label="Date" style="padding:12px;">
+                        {{ appointment.appointment_date }}
+                    </td>
+
+                    <td data-label="Time" style="padding:12px;">
+                        {{ appointment.appointment_time }}
+                    </td>
+
+                    <!-- STATUS COLUMN -->
+                    <td data-label="Status" style="padding:12px;">
+
+                        {% if appointment.payment and appointment.payment.status == 'completed' %}
+
+                            <span style="background:#27ae60; color:white; padding:5px 10px; border-radius:4px;">
+                                ✅ Paid
+                            </span>
+
+                        {% else %}
+
+                            <span style="background:#e67e22; color:white; padding:5px 10px; border-radius:4px;">
+                                💳 Not Paid
+                            </span>
+
+                        {% endif %}
+
+                    </td>
+
+                    <!-- ACTIONS -->
+                    <td data-label="Actions" style="padding:12px;">
+
+                        <a href="{% url 'appointment:appointment_update' appointment.id %}" 
+                           style="background:#27ae60; color:white; padding:5px 10px; border-radius:4px; text-decoration:none; margin-right:5px;">
+                           Edit
+                        </a>
+
+                        <a href="{% url 'appointment:appointment_delete' appointment.id %}" 
+                           style="background:#c0392b; color:white; padding:5px 10px; border-radius:4px; text-decoration:none; margin-right:5px;">
+                           Delete
+                        </a>
+
+                        <!-- Receipt ONLY if paid -->
+                        {% if appointment.payment and appointment.payment.status == 'completed' %}
+
+                            <a href="{% url 'accounts:view_receipt' appointment.payment.id %}" 
+                               style="background:#34495e; color:white; padding:5px 10px; border-radius:4px; text-decoration:none;">
+                               🧾 Receipt
+                            </a>
+
+                        {% endif %}
+
+                    </td>
+
                 </tr>
+
                 {% empty %}
                 <tr>
-                    <td colspan="4" style="text-align:center; padding:15px; color:#7f8c8d;">No appointments found.</td>
+                    <td colspan="6" style="text-align:center; padding:15px; color:#7f8c8d;">
+                        No appointments found.
+                    </td>
                 </tr>
                 {% endfor %}
             </tbody>
+
         </table>
     </div>
 
 </div>
 
-<!-- Hover effects -->
 <style>
     table tbody tr:hover {
         background-color: #f2f2f2;
     }
+
     a:hover {
         opacity: 0.85;
+    }
+
+    @media (max-width: 600px) {
+        table, thead, tbody, th, td, tr {
+            display: block;
+        }
+
+        thead tr {
+            display: none;
+        }
+
+        tbody tr {
+            margin-bottom: 15px;
+            border-bottom: 2px solid #ddd;
+        }
+
+        td {
+            padding: 10px;
+            text-align: right;
+            position: relative;
+        }
+
+        td::before {
+            content: attr(data-label);
+            position: absolute;
+            left: 10px;
+            font-weight: bold;
+            text-align: left;
+        }
     }
 </style>
 

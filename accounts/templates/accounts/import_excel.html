@@ -1,0 +1,16 @@
+{% extends 'layout.html' %}
+{% block content %}
+<h2>Import Symptom Records from Excel</h2>
+
+<form method="POST" enctype="multipart/form-data" class="import-form">
+    {% csrf_token %}
+    <div>
+        <label for="excel_file">Select Excel File (.xlsx):</label>
+        <input type="file" name="excel_file" id="excel_file" accept=".xlsx" required>
+    </div>
+    <div style="margin-top: 10px;">
+        <button type="submit">Upload & Import</button>
+    </div>
+</form>
+
+{% endblock %}

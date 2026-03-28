@@ -1,0 +1,16 @@
+{% extends "layout.html"%}
+{% block content%}
+<h2>Write Prescription</h2>
+
+<form method="POST">
+    {% csrf_token %}
+
+    <label>Medicines</label><br>
+    <textarea name="medicines" required></textarea><br><br>
+
+    <label>Notes</label><br>
+    <textarea name="notes"></textarea><br><br>
+
+    <button type="submit">Save Prescription</button>
+</form>
+{%endblock%}

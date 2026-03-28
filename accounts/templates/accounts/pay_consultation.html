@@ -1,0 +1,83 @@
+{% extends "layout.html" %}
+
+{% block content %}
+
+<div style="max-width:600px; margin:50px auto; padding:30px; background:#fff; border-radius:10px; box-shadow:0 4px 10px rgba(0,0,0,0.1);">
+
+    <h2 style="color:#2c3e50; margin-bottom:15px;">Consultation Payment</h2>
+
+    <!-- Consultation Details -->
+    <div style="margin-bottom:20px;">
+        <p><strong>Doctor:</strong> {{ payment.consultation.doctor.username }}</p>
+        <p><strong>Date:</strong> {{ payment.consultation.appointment_date }}</p>
+        <p><strong>Time:</strong> {{ payment.consultation.appointment_time }}</p>
+        <p><strong>Type:</strong> {{ payment.consultation.consultation_type|capfirst }}</p>
+    </div>
+
+    <!-- Amount / Insurance Info -->
+    <div style="margin-bottom:25px;">
+        <h3 style="color:#16a34a;">Amount to Pay: ${{ payment.amount }}</h3>
+    </div>
+
+    <!-- Payment Status -->
+    {% if payment.status == 'completed' %}
+        <div style="padding:15px; background:#d1fae5; color:#065f46; border-radius:5px; margin-bottom:20px;">
+            ✅ Payment already completed
+        </div>
+    {% else %}
+        <!-- Payment Method Selection -->
+        <form id="payment-form" method="POST">
+            {% csrf_token %}
+
+            <label for="payment-method">Select Payment Method:</label>
+            <select id="payment-method" name="payment_method"
+                style="width:100%; padding:10px; margin:10px 0; border-radius:5px; border:1px solid #ccc;">
+                <option value="">-- Choose --</option>
+                <option value="mpesa">M-Pesa</option>
+                <option value="insurance">Insurance</option>
+                <option value="cash">Cash</option>
+            </select>
+
+            <!-- Mpesa Fields -->
+            <div id="mpesa-fields" style="display:none; margin-top:10px;">
+                <label for="phone_number">Enter your phone number for M-Pesa:</label>
+                <input type="text" id="phone_number" name="phone_number" placeholder="2547XXXXXXXX"
+                    style="width:100%; padding:10px; margin:10px 0; border-radius:5px; border:1px solid #ccc;">
+            </div>
+
+            <!-- Insurance Fields -->
+            <div id="insurance-fields" style="display:none; margin-top:10px;">
+                <label for="insurance_provider">Enter your insurance provider:</label>
+                <input type="text" id="insurance_provider" name="insurance_provider"
+                    style="width:100%; padding:10px; margin:10px 0; border-radius:5px; border:1px solid #ccc;">
+            </div>
+
+            <button type="submit"
+                style="width:100%; padding:12px; background:#3498db; color:white; border:none; border-radius:5px; font-size:16px;">
+                Pay Now
+            </button>
+        </form>
+    {% endif %}
+
+</div>
+
+<!-- JS to Show/Hide Fields -->
+<script>
+document.getElementById('payment-method').addEventListener('change', function() {
+    const mpesaFields = document.getElementById('mpesa-fields');
+    const insuranceFields = document.getElementById('insurance-fields');
+
+    if (this.value === 'mpesa') {
+        mpesaFields.style.display = 'block';
+        insuranceFields.style.display = 'none';
+    } else if (this.value === 'insurance') {
+        mpesaFields.style.display = 'none';
+        insuranceFields.style.display = 'block';
+    } else {
+        mpesaFields.style.display = 'none';
+        insuranceFields.style.display = 'none';
+    }
+});
+</script>
+
+{% endblock %}

@@ -45,16 +45,25 @@ def patient_delete(request, pk):
     patient.delete()
     return redirect('patients:patient_list')
 
-def patient_dashboard(request):
+from django.shortcuts import render
+from accounts.models import Payment # Make sure Payment is imported
 
-    appointments = Appointment.objects.filter(patient=request.user)
-    consultations = Consultation.objects.filter(patient=request.user)
-    records = MedicalRecord.objects.filter(patient=request.user)
+def patient_dashboard(request):
+    patient = request.user
+
+    # Existing queries
+    appointments = Appointment.objects.filter(patient=patient)
+    consultations = Consultation.objects.filter(patient=patient)
+    records = MedicalRecord.objects.filter(patient=patient)
+
+    # Add payments
+    payments = Payment.objects.filter(user=patient).order_by('-created_at')  # latest first
 
     context = {
         'appointments': appointments,
         'consultations': consultations,
-        'records': records
+        'records': records,
+        'payments': payments,  # new addition
     }
 
     return render(request, 'patients/patient_dashboard.html', context)

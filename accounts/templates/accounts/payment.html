@@ -1,0 +1,110 @@
+{% extends "layout.html" %}
+
+{% block content %}
+<div style="max-width:600px; margin:50px auto; padding:30px; background:#fff; border-radius:10px; box-shadow:0 4px 10px rgba(0,0,0,0.1);">
+
+    <h2 style="color:#2c3e50; margin-bottom:20px;">Make a Payment</h2>
+
+    <!-- Payment Details -->
+    <p>Doctor: <strong>{{ payment.appointment.doctor.username }}</strong></p>
+    <p>Date: <strong>{{ payment.appointment.appointment_date }}</strong></p>
+    <p>Time: <strong>{{ payment.appointment.appointment_time }}</strong></p>
+    <p>Amount: <strong>KES {{ payment.amount }}</strong></p>
+
+    {% if payment.status == 'completed' %}
+        <p style="color:green; font-weight:bold;">Payment Completed ✅</p>
+    {% else %}
+
+        <form method="POST">
+            {% csrf_token %}
+
+            <label style="display:block; margin-bottom:10px;">Payment Method:</label>
+            <select id="payment_method" name="payment_method"
+                    style="width:100%; padding:10px; border-radius:5px; border:1px solid #ccc; margin-bottom:20px;">
+                <option value="stripe">Stripe</option>
+                <option value="mpesa">Mpesa</option>
+                <option value="cash">Cash</option>
+                <option value="insurance">Insurance</option>
+            </select>
+
+            <!-- Mpesa -->
+            <div id="phone-field" style="display:none;">
+                <label>Phone Number (Mpesa):</label>
+                <input type="text" name="phone_number"
+                       style="width:100%; padding:10px; margin-bottom:20px;">
+            </div>
+
+            <!-- Insurance -->
+            <div id="insurance-field" style="display:none;">
+                <label>Insurance Provider:</label>
+                <input type="text" name="insurance_provider"
+                       style="width:100%; padding:10px; margin-bottom:20px;">
+            </div>
+
+            <button type="submit"
+                    style="width:100%; padding:10px; background:#3498db; color:white;">
+                Pay Now
+            </button>
+        </form>
+
+    {% endif %}
+
+</div>
+
+<!-- ✅ ADD THIS SECTION (Appointments) -->
+<div style="max-width:900px; margin:40px auto;">
+    <h2>📅 My Appointments</h2>
+
+    {% for appointment in appointments %}
+        <div style="padding:15px; border:1px solid #ddd; margin-bottom:10px;">
+            <p>Doctor: {{ appointment.doctor.username }}</p>
+            <p>Date: {{ appointment.appointment_date }}</p>
+            <p>Time: {{ appointment.appointment_time }}</p>
+            <p>Status: {{ appointment.status }}</p>
+        </div>
+    {% empty %}
+        <p>No appointments found.</p>
+    {% endfor %}
+</div>
+
+<!-- ✅ ADD THIS SECTION (Consultations) -->
+<div style="max-width:900px; margin:40px auto;">
+    <h2>🩺 My Consultations</h2>
+
+    {% for consultation in consultations %}
+        <div style="padding:15px; border:1px solid #ddd; margin-bottom:10px;">
+            <p>Doctor: {{ consultation.doctor.username }}</p>
+            <p>Date: {{ consultation.date }}</p>
+            <p>Notes: {{ consultation.notes }}</p>
+        </div>
+    {% empty %}
+        <p>No consultations found.</p>
+    {% endfor %}
+</div>
+
+<!-- JS -->
+<script>
+    const paymentMethod = document.getElementById("payment_method");
+    const phoneField = document.getElementById("phone-field");
+    const insuranceField = document.getElementById("insurance-field");
+
+    function toggleFields() {
+        if (paymentMethod.value === "mpesa") {
+            phoneField.style.display = "block";
+            insuranceField.style.display = "none";
+        } 
+        else if (paymentMethod.value === "insurance") {
+            phoneField.style.display = "none";
+            insuranceField.style.display = "block";
+        } 
+        else {
+            phoneField.style.display = "none";
+            insuranceField.style.display = "none";
+        }
+    }
+
+    paymentMethod.addEventListener("change", toggleFields);
+    toggleFields();
+</script>
+
+{% endblock %}

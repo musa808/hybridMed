@@ -1,0 +1,18 @@
+{% extends 'layout.html' %}
+
+{% block content %}
+<h2>AI Symptom Checker</h2>
+
+<form method="POST">
+    {% csrf_token %}
+    <label for="symptoms">Enter your symptoms:</label><br>
+    <textarea id="symptoms" name="symptoms" rows="5" cols="50" placeholder="Describe your symptoms here..."></textarea><br><br>
+    <button type="submit">Check Symptoms</button>
+</form>
+
+{% if result %}
+<h3>Possible Diagnosis / Advice:</h3>
+<p>{{ result }}</p>
+{% endif %}
+
+{% endblock %}

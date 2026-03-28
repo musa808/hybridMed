@@ -1,0 +1,57 @@
+{% extends "layout.html" %}
+
+{% block content %}
+<div class="send-message-container">
+
+    <h2>Send Message</h2>
+
+    <form method="POST">
+        {% csrf_token %}
+        <label>Recipient:</label>
+        <select name="recipient" required>
+            {% for user in users %}
+                <option value="{{ user.id }}">{{ user.username }}</option>
+            {% endfor %}
+        </select>
+
+        <label>Subject:</label>
+        <input type="text" name="subject" required>
+
+        <label>Message:</label>
+        <textarea name="body" rows="5" required></textarea>
+
+        <button type="submit" style="padding:10px 20px; background:#3498db; color:white; border:none; border-radius:5px; margin-top:10px;">
+            Send
+        </button>
+    </form>
+
+</div>
+
+<style>
+.send-message-container {
+    max-width: 600px;
+    margin: 50px auto;
+    padding: 20px;
+    background: #fff;
+    border-radius: 10px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    font-family: Arial, sans-serif;
+}
+
+.send-message-container label {
+    display: block;
+    margin-top: 10px;
+    margin-bottom: 5px;
+    font-weight: bold;
+}
+
+.send-message-container input,
+.send-message-container select,
+.send-message-container textarea {
+    width: 100%;
+    padding: 10px;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+}
+</style>
+{% endblock %}

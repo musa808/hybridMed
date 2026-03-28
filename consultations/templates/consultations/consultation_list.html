@@ -6,13 +6,17 @@
     <!-- Header -->
     <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
         <h2 style="color:#2c3e50;">Consultations</h2>
+
         <a href="{% url 'consultations:consultation_create' %}" 
-           style="background:#2980b9; color:white; padding:10px 15px; border-radius:6px; text-decoration:none;">➕ Add Consultation</a>
+           style="background:#2980b9; color:white; padding:10px 15px; border-radius:6px; text-decoration:none;">
+           ➕ Add Consultation
+        </a>
     </div>
 
-    <!-- Consultations Table -->
+    <!-- Table -->
     <div style="overflow-x:auto;">
         <table style="width:100%; border-collapse:collapse; box-shadow:0 2px 10px rgba(0,0,0,0.1);">
+
             <thead>
                 <tr style="background:#3498db; color:white; text-align:left;">
                     <th style="padding:12px;">Patient</th>
@@ -21,37 +25,139 @@
                     <th style="padding:12px;">Actions</th>
                 </tr>
             </thead>
+
             <tbody>
                 {% for consultation in consultations %}
                 <tr style="border-bottom:1px solid #ddd;">
-                    <td style="padding:12px;">{{ consultation.patient }}</td>
-                    <td style="padding:12px;">{{ consultation.doctor }}</td>
-                    <td style="padding:12px;">{{ consultation.symptoms }}</td>
-                    <td style="padding:12px;">
-                        <a href="{% url 'consultations:consultation_update' consultation.id %}" 
-                           style="background:#27ae60; color:white; padding:5px 10px; border-radius:4px; text-decoration:none; margin-right:5px;">Edit</a>
-                        <a href="{% url 'consultations:consultation_delete' consultation.id %}" 
-                           style="background:#c0392b; color:white; padding:5px 10px; border-radius:4px; text-decoration:none;">Delete</a>
+
+                    <td data-label="Patient" style="padding:12px;">{{ consultation.patient }}</td>
+                    <td data-label="Doctor" style="padding:12px;">{{ consultation.doctor }}</td>
+                    <td data-label="Symptoms" style="padding:12px;">{{ consultation.symptoms }}</td>
+
+                    <td data-label="Actions" style="padding:12px;">
+                        <div style="display:flex; flex-wrap:wrap; gap:6px;">
+
+                            <!-- COMMON ACTIONS -->
+                            <a href="{% url 'consultations:consultation_update' consultation.id %}" 
+                               style="background:#27ae60; color:white; padding:5px 10px; border-radius:4px; text-decoration:none;">
+                               Edit
+                            </a>
+
+                            <a href="{% url 'consultations:consultation_delete' consultation.id %}" 
+                               style="background:#c0392b; color:white; padding:5px 10px; border-radius:4px; text-decoration:none;">
+                               Delete
+                            </a>
+
+                            <!-- GOOGLE MEET -->
+                            {% if consultation.onlineconsultation and consultation.onlineconsultation.link %}
+                                <a href="{{ consultation.onlineconsultation.link }}" target="_blank"
+                                   style="background:#8e44ad; color:white; padding:5px 10px; border-radius:4px; text-decoration:none;">
+                                   🎥 Join Meet
+                                </a>
+                            {% else %}
+                                <a href="{% url 'accounts:create_consultation_link' consultation.id %}" 
+                                   style="background:#f39c12; color:white; padding:5px 10px; border-radius:4px; text-decoration:none;">
+                                   Generate Meeting
+                                </a>
+                            {% endif %}
+
+                            <!-- DOCTOR ACTIONS -->
+                            {% if user.id == consultation.doctor.id %}
+                                <a href="{% url 'accounts:create_prescription' consultation.id %}" 
+                                   style="background:#16a085; color:white; padding:5px 10px; border-radius:4px; text-decoration:none;">
+                                   💊 Write Prescription
+                                </a>
+
+                                <a href="{% url 'accounts:view_prescription' consultation.id %}" 
+                                   style="background:#2c3e50; color:white; padding:5px 10px; border-radius:4px; text-decoration:none;">
+                                   📄 View Prescription
+                                </a>
+                            {% endif %}
+
+                            <!-- PATIENT ACTIONS -->
+                            {% if user.id == consultation.patient.id %}
+
+                                {% if consultation.payment and consultation.payment.status == "completed" %}
+
+                                    <span style="background:#27ae60; color:white; padding:5px 10px; border-radius:4px;">
+                                        ✅ Paid
+                                    </span>
+
+                                    <a href="{% url 'accounts:view_receipt' consultation.payment.id %}" 
+                                       style="background:#34495e; color:white; padding:5px 10px; border-radius:4px; text-decoration:none;">
+                                       🧾 Receipt
+                                    </a>
+
+                                    <a href="{% url 'accounts:view_prescription' consultation.id %}" 
+                                       style="background:#2c3e50; color:white; padding:5px 10px; border-radius:4px; text-decoration:none;">
+                                       💊 My Prescription
+                                    </a>
+
+                                {% else %}
+
+                                    <a href="{% url 'accounts:payment_page' consultation.id %}" 
+                                       style="background:#e67e22; color:white; padding:5px 10px; border-radius:4px; text-decoration:none;">
+                                       💳 Pay
+                                    </a>
+
+                                {% endif %}
+
+                            {% endif %}
+
+                        </div>
                     </td>
                 </tr>
+
                 {% empty %}
                 <tr>
-                    <td colspan="4" style="text-align:center; padding:15px; color:#7f8c8d;">No consultations found.</td>
+                    <td colspan="4" style="text-align:center; padding:15px; color:#7f8c8d;">
+                        No consultations found.
+                    </td>
                 </tr>
                 {% endfor %}
             </tbody>
+
         </table>
     </div>
 
 </div>
 
-<!-- Hover effects -->
 <style>
     table tbody tr:hover {
         background-color: #f2f2f2;
     }
+
     a:hover {
         opacity: 0.85;
+    }
+
+    @media (max-width: 600px) {
+        table, thead, tbody, th, td, tr {
+            display: block;
+        }
+
+        thead tr {
+            display: none;
+        }
+
+        tbody tr {
+            margin-bottom: 15px;
+            border-bottom: 2px solid #ddd;
+        }
+
+        td {
+            padding: 10px;
+            text-align: right;
+            position: relative;
+        }
+
+        td::before {
+            content: attr(data-label);
+            position: absolute;
+            left: 10px;
+            font-weight: bold;
+            text-align: left;
+        }
     }
 </style>
 
