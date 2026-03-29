@@ -166,7 +166,7 @@ from django.http import HttpResponse
 from django.template.loader import render_to_string
 from django.contrib import messages
 from django.utils.timezone import localtime
-from xhtml2pdf import pisa
+from reportlab.pdfgen import canvas
 from django.contrib.auth.models import User
 from PyPDF2 import PdfReader
 
@@ -231,16 +231,41 @@ def _import_pdf(pdf_file):
 
 
 # -------------------- Export PDF --------------------
+from django.http import HttpResponse
+from django.utils.timezone import localtime
+from reportlab.lib.pagesizes import letter
+from reportlab.pdfgen import canvas
+from .models import SymptomCheck
+
+
 def export_symptoms_pdf(request):
     records = SymptomCheck.objects.all()
-    for r in records:
-        r.created_at = localtime(r.created_at).replace(tzinfo=None)
-    html_string = render_to_string('accounts/symptoms_result.html', {'records': records})
+
     response = HttpResponse(content_type='application/pdf')
     response['Content-Disposition'] = 'attachment; filename="SymptomRecords.pdf"'
-    pisa_status = pisa.CreatePDF(html_string, dest=response)
-    if pisa_status.err:
-        return HttpResponse('Error generating PDF')
+
+    p = canvas.Canvas(response, pagesize=letter)
+
+    y = 750  # starting vertical position
+
+    p.drawString(50, y, "Symptom Records")
+    y -= 40
+
+    for r in records:
+        created = localtime(r.created_at).strftime("%Y-%m-%d %H:%M")
+
+        p.drawString(50, y, f"User: {r.user}")
+        y -= 20
+        p.drawString(50, y, f"Symptoms: {r.symptoms}")
+        y -= 20
+        p.drawString(50, y, f"Date: {created}")
+        y -= 40
+
+        if y < 50:
+            p.showPage()
+            y = 750
+
+    p.save()
     return response
 
 
