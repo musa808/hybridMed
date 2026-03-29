@@ -15,7 +15,8 @@ urlpatterns = [
     path('payment/success/<int:payment_id>/', views.payment_success, name='payment_success'),
     path('receipt/<int:payment_id>/', views.view_receipt, name='view_receipt'),
     path('verify/<uidb64>/<token>/', views.verify_email, name='verify_email'),
-    # Export
+    path('resend-otp/', views.resend_otp, name='resend_otp'),
+
     path('export/excel/', views.export_symptoms_excel, name='export_symptoms_excel'),
     path('export/pdf/', views.export_symptoms_pdf, name='export_symptoms_pdf'),
 
@@ -34,7 +35,7 @@ urlpatterns = [
     path('dashboard/', views.records_dashboard, name='records_dashboard'),
     path('create-consultation/<int:consultation_id>/', views.create_consultation_link, name='create_consultation_link'),
     path('consultation/<uuid:token>/', views.consultation_room, name='consultation_room'),
-
+    path('symptom-checker/', views.symptom_checker, name='symptoms_checker'),
     # Symptom checker
     path('symptom-checker/', views.ai_symptom_checker, name='ai_symptom_checker'),
 ]

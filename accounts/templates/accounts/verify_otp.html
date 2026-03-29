@@ -2,13 +2,50 @@
 {% block content%}
 <h2>Enter OTP</h2>
 
+<!-- Success / Info Messages -->
+{% if messages %}
+    {% for message in messages %}
+        <p style="color:green;">{{ message }}</p>
+    {% endfor %}
+{% endif %}
+
 <form method="POST">
     {% csrf_token %}
     <input type="text" name="otp" placeholder="Enter OTP" required>
     <button type="submit">Verify</button>
 </form>
 
+<!-- Resend OTP -->
+<p style="margin-top:10px;">
+    Didn't receive the code?
+    <a href="{% url 'accounts:resend_otp' %}" id="resend-link">Resend</a>
+</p>
+
 {% if error %}
 <p style="color:red;">{{ error }}</p>
 {% endif %}
+
+<!-- Optional: Resend cooldown -->
+<script>
+let resendLink = document.getElementById("resend-link");
+let countdown = 30;
+
+if (resendLink) {
+    resendLink.style.pointerEvents = "none";
+    resendLink.style.color = "gray";
+
+    let interval = setInterval(() => {
+        resendLink.textContent = `Resend in ${countdown}s`;
+        countdown--;
+
+        if (countdown < 0) {
+            clearInterval(interval);
+            resendLink.textContent = "Resend";
+            resendLink.style.pointerEvents = "auto";
+            resendLink.style.color = "blue";
+        }
+    }, 1000);
+}
+</script>
+
 {% endblock%}

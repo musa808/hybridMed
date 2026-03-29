@@ -582,6 +582,9 @@ def create_consultation_link(request, consultation_id):
         online.save()
 
     return redirect(online.link)
+from django.shortcuts import render
+
+
 from openai import OpenAI
 from django.conf import settings
 from django.shortcuts import render
@@ -645,17 +648,6 @@ from django.conf import settings
 
 openai.api_key = settings.OPENAI_API_KEY  # make sure you put your API key in settings
 
-def symptom_checker(request):
-    result = None
-    if request.method == "POST":
-        symptoms = request.POST.get("symptoms")
-        if symptoms:
-            response = openai.ChatCompletion.create(
-                model="gpt-4",
-                messages=[{"role": "user", "content": f"I have these symptoms: {symptoms}. What could be the possible causes?"}]
-            )
-            result = response.choices[0].message['content']
-    return render(request, "accounts/symptom_form.html", {"result": result})
 
 from django.shortcuts import render, get_object_or_404
 from .models import Consultation, OnlineConsultation
@@ -679,7 +671,26 @@ def consultation_room(request, consultation_id):
 
     return render(request, "accounts/consultation_room.html", context)
 from django.utils.translation import gettext as _
+from django.shortcuts import render
 
+def symptom_checker(request):
+    result = None
+
+    if request.method == "POST":
+        symptoms = request.POST.get("symptoms", "").lower()
+
+        if "fever" in symptoms and "cough" in symptoms:
+            result = "You may have flu or a respiratory infection."
+        elif "headache" in symptoms and "nausea" in symptoms:
+            result = "You may have a migraine."
+        elif "chest pain" in symptoms:
+            result = "⚠️ This could be serious. Seek medical attention."
+        elif "stomach" in symptoms or "abdominal pain" in symptoms:
+            result = "You may have a digestive issue."
+        else:
+            result = "Symptoms unclear. Please consult a doctor."
+
+    return render(request, "accounts/symptoms_form.html", {"result": result})
 def my_view(request):
     message = _("Welcome to Medical System")
     return HttpResponse(message)
@@ -962,3 +973,27 @@ def verify_email(request, uidb64, token):
         return HttpResponse("Email verified successfully!")
     else:
         return HttpResponse("Invalid or expired token")
+
+import random
+from django.core.mail import send_mail
+from django.shortcuts import redirect
+from django.contrib import messages
+
+def resend_otp(request):
+    if request.user.is_authenticated:
+        otp = random.randint(100000, 999999)
+
+        # Save OTP in session
+        request.session['otp'] = str(otp)
+
+        # Send email
+        send_mail(
+            'Your OTP Code',
+            f'Your new OTP is: {otp}',
+            None,
+            [request.user.email],
+        )
+
+        messages.success(request, "A new OTP has been sent to your email.")
+
+    return redirect('accounts:verify_otp')
