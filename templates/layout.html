@@ -69,10 +69,21 @@ body {
     box-shadow: 0 2px 8px rgba(0,0,0,0.08);
 }
 
+/* MENU BUTTON */
 .menu-btn {
     display: none;
     font-size: 24px;
     cursor: pointer;
+}
+
+/* USER */
+.user a {
+    margin-left: 10px;
+    text-decoration: none;
+    padding: 6px 10px;
+    background: #ef4444;
+    color: white;
+    border-radius: 5px;
 }
 
 /* CONTENT */
@@ -102,26 +113,17 @@ form button {
     background: #16a34a;
     color: white;
     border: none;
+    border-radius: 5px;
 }
 
-/* DROPDOWN */
-.icon-box {
-    position: relative;
-    cursor: pointer;
+/* SYMPTOM LINK STYLE */
+.special-link {
+    background: #16a34a;
+    color: white;
 }
 
-.dropdown {
-    display: none;
-    position: absolute;
-    right: 0;
-    top: 30px;
-    background: white;
-    width: 250px;
-    border-radius: 8px;
-}
-
-.icon-box:hover .dropdown {
-    display: block;
+.special-link:hover {
+    background: #15803d;
 }
 
 /* MOBILE */
@@ -144,10 +146,6 @@ form button {
 
     .menu-btn {
         display: block;
-    }
-
-    form {
-        width: 100%;
     }
 }
 </style>
@@ -181,9 +179,10 @@ form button {
 
     <hr>
 
+    <!-- ✅ SYMPTOM CHECKER (FIXED NAME) -->
     {% if user.is_authenticated %}
-        <a href="{% url 'accounts:ai_symptom_checker' %}" style="color:white;background:#16a34a;">
-            🧠 AI Symptom Checker
+        <a href="{% url 'accounts:symptoms_checker' %}" class="special-link">
+            🧠 Symptom Checker
         </a>
     {% endif %}
 
@@ -203,7 +202,6 @@ form button {
 
     <!-- NAVBAR -->
     <div class="navbar">
-
         <span class="menu-btn" onclick="toggleSidebar()">☰</span>
 
         <h3>Hybrid Medical Consultancy</h3>

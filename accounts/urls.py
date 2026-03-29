@@ -14,7 +14,7 @@ urlpatterns = [
     path('receipt/download/<int:payment_id>/', views.download_receipt, name='download_receipt'),
     path('payment/success/<int:payment_id>/', views.payment_success, name='payment_success'),
     path('receipt/<int:payment_id>/', views.view_receipt, name='view_receipt'),
-
+    path('verify/<uidb64>/<token>/', views.verify_email, name='verify_email'),
     # Export
     path('export/excel/', views.export_symptoms_excel, name='export_symptoms_excel'),
     path('export/pdf/', views.export_symptoms_pdf, name='export_symptoms_pdf'),

@@ -922,3 +922,43 @@ def download_receipt(request, payment_id):
     doc.build(elements)
 
     return response
+
+from django.core.mail import send_mail
+from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
+from django.contrib.auth.tokens import default_token_generator
+from django.utils.encoding import force_bytes
+
+def send_verification_email(user, request):
+    uid = urlsafe_base64_encode(force_bytes(user.pk))
+    token = default_token_generator.make_token(user)
+
+    verification_link = request.build_absolute_uri(
+        f"/accounts/verify/{uid}/{token}/"
+    )
+
+    send_mail(
+        "Verify your email",
+        f"Click this link to verify your account:\n{verification_link}",
+        "your_email@gmail.com",
+        [user.email],
+        fail_silently=False,
+    )
+
+from django.contrib.auth.models import User
+from django.shortcuts import redirect, HttpResponse
+from django.utils.http import urlsafe_base64_decode
+from django.contrib.auth.tokens import default_token_generator
+
+def verify_email(request, uidb64, token):
+    try:
+        uid = urlsafe_base64_decode(uidb64).decode()
+        user = User.objects.get(pk=uid)
+    except:
+        return HttpResponse("Invalid link")
+
+    if default_token_generator.check_token(user, token):
+        user.is_active = True
+        user.save()
+        return HttpResponse("Email verified successfully!")
+    else:
+        return HttpResponse("Invalid or expired token")

@@ -82,3 +82,23 @@ def create_google_meet_event():
     ).execute()
 
     return event['conferenceData']['entryPoints'][0]['uri']
+from django.core.mail import send_mail
+from django.utils.http import urlsafe_base64_encode
+from django.utils.encoding import force_bytes
+from django.contrib.auth.tokens import default_token_generator
+
+def send_verification_email(user, request):
+    uid = urlsafe_base64_encode(force_bytes(user.pk))
+    token = default_token_generator.make_token(user)
+
+    link = request.build_absolute_uri(
+        f"/accounts/verify/{uid}/{token}/"
+    )
+
+    send_mail(
+        "Verify your account",
+        f"Click this link to verify your account:\n{link}",
+        "your_email@gmail.com",
+        [user.email],
+        fail_silently=False,
+    )
