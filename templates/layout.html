@@ -1,254 +1,162 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <title>Hybrid Medical Consultancy</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta charset="UTF-8">
+<title>Hybrid Medical Consultancy</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <style>
-        /* Global Reset & Font */
-        * {
-            margin: 0; padding: 0; box-sizing: border-box;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        }
+<style>
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
 
-        body {
-            display: flex;
-            min-height: 100vh;
-            background: #f4f6f9;
-        }
+body {
+    display: flex;
+    min-height: 100vh;
+    background: #f4f6f9;
+}
 
-        /* Sidebar */
-        .sidebar {
-            width: 260px;
-            background: linear-gradient(180deg, #1e293b 0%, #111827 100%);
-            color: #fff;
-            height: 100vh;
-            position: fixed;
-            overflow-y: auto;
-            transition: 0.3s;
-            box-shadow: 2px 0 8px rgba(0,0,0,0.1);
-        }
+/* SIDEBAR */
+.sidebar {
+    width: 260px;
+    background: linear-gradient(180deg, #1e293b 0%, #111827 100%);
+    color: #fff;
+    height: 100vh;
+    position: fixed;
+    overflow-y: auto;
+    transition: 0.3s;
+}
 
-        .sidebar h2 {
-            text-align: center;
-            padding: 20px 0;
-            font-size: 22px;
-            font-weight: bold;
-            background: #111827;
-            margin-bottom: 15px;
-        }
+.sidebar h2 {
+    text-align: center;
+    padding: 20px;
+    background: #111827;
+}
 
-        .sidebar a {
-            display: flex;
-            align-items: center;
-            padding: 12px 25px;
-            color: #cbd5e1;
-            text-decoration: none;
-            font-size: 16px;
-            transition: all 0.3s ease;
-            border-radius: 6px;
-            margin: 4px 10px;
-        }
+.sidebar a {
+    display: block;
+    padding: 12px 20px;
+    color: #cbd5e1;
+    text-decoration: none;
+}
 
-        .sidebar a:hover {
-            background: #2563eb;
-            color: #fff;
-            transform: translateX(5px);
-        }
+.sidebar a:hover {
+    background: #2563eb;
+    color: white;
+}
 
-        .sidebar hr {
-            border: 0.5px solid #334155;
-            margin: 15px 0;
-        }
+.sidebar hr {
+    border: 0.5px solid #334155;
+}
 
-        /* ✅ NEW: Active link highlight (does not affect existing behavior) */
-        .sidebar a.active {
-            background: #2563eb;
-            color: #fff;
-        }
+/* MAIN */
+.main {
+    margin-left: 260px;
+    width: calc(100% - 260px);
+}
 
-        /* Main Content */
-        .main {
-            margin-left: 260px;
-            width: calc(100% - 260px);
-            display: flex;
-            flex-direction: column;
-        }
+/* NAVBAR */
+.navbar {
+    height: 60px;
+    background: white;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 20px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+}
 
-        /* Navbar */
-        .navbar {
-            height: 60px;
-            background: white;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 0 25px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
-        }
+.menu-btn {
+    display: none;
+    font-size: 24px;
+    cursor: pointer;
+}
 
-        .navbar h3 {
-            color: #1e293b;
-            font-weight: 600;
-        }
+/* CONTENT */
+.content {
+    padding: 20px;
+}
 
-        .user {
-            display: flex;
-            align-items: center;
-            gap: 15px;
-            position: relative;
-        }
+/* FORM */
+form {
+    max-width: 600px;
+    background: white;
+    padding: 20px;
+    border-radius: 10px;
+}
 
-        .user a {
-            margin-left: 12px;
-            text-decoration: none;
-            font-weight: 600;
-            color: #1e293b;
-            padding: 6px 12px;
-            border-radius: 5px;
-            transition: all 0.3s ease;
-        }
+form input,
+form textarea,
+form select {
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 12px;
+}
 
-        .user a:hover {
-            background: #2563eb;
-            color: white;
-        }
+form button {
+    width: 100%;
+    padding: 12px;
+    background: #16a34a;
+    color: white;
+    border: none;
+}
 
-        /* Notifications & Messages */
-        .icon-box {
-            position: relative;
-            cursor: pointer;
-        }
+/* DROPDOWN */
+.icon-box {
+    position: relative;
+    cursor: pointer;
+}
 
-        .badge {
-            position: absolute;
-            top: -6px;
-            right: -8px;
-            background: red;
-            color: white;
-            border-radius: 50%;
-            font-size: 11px;
-            padding: 2px 6px;
-        }
+.dropdown {
+    display: none;
+    position: absolute;
+    right: 0;
+    top: 30px;
+    background: white;
+    width: 250px;
+    border-radius: 8px;
+}
 
-        .dropdown {
-            display: none;
-            position: absolute;
-            right: 0;
-            top: 35px;
-            background: white;
-            width: 300px;
-            border-radius: 8px;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
-            max-height: 300px;
-            overflow-y: auto;
-            z-index: 100;
-        }
+.icon-box:hover .dropdown {
+    display: block;
+}
 
-        .dropdown div {
-            padding: 10px;
-            border-bottom: 1px solid #eee;
-            font-size: 14px;
-        }
+/* MOBILE */
+@media (max-width: 768px) {
 
-        .dropdown div:hover {
-            background: #f1f5f9;
-        }
+    .sidebar {
+        left: -260px;
+        position: fixed;
+        z-index: 1000;
+    }
 
-        .icon-box:hover .dropdown {
-            display: block;
-        }
+    .sidebar.active {
+        left: 0;
+    }
 
-        /* Page Content */
-        .content {
-            padding: 30px;
-            background: #f4f6f9;
-            flex: 1;
-        }
+    .main {
+        margin-left: 0;
+        width: 100%;
+    }
 
-        /* ✅ FORM STYLING (RESTORED + IMPROVED) */
-        form {
-            max-width: 600px;
-            background: white;
-            padding: 25px;
-            border-radius: 12px;
-            box-shadow: 0 8px 20px rgba(0,0,0,0.06);
-        }
+    .menu-btn {
+        display: block;
+    }
 
-        form label {
-            font-weight: 600;
-            display: block;
-            margin-bottom: 6px;
-            color: #1e293b;
-        }
-
-        form textarea,
-        form input,
-        form select {
-            width: 100%;
-            padding: 12px;
-            border: 1px solid #cbd5e1;
-            border-radius: 8px;
-            margin-bottom: 15px;
-            font-size: 14px;
-            transition: 0.2s;
-        }
-
-        form textarea:focus,
-        form input:focus,
-        form select:focus {
-            outline: none;
-            border-color: #2563eb;
-            box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.1);
-        }
-
-        form button {
-            background: #16a34a;
-            color: white;
-            padding: 12px;
-            border: none;
-            border-radius: 8px;
-            font-weight: 600;
-            cursor: pointer;
-            width: 100%;
-            transition: 0.3s;
-        }
-
-        form button:hover {
-            background: #15803d;
-        }
-
-        /* Result Box */
-        .result-box {
-            margin-top: 20px;
-            padding: 15px;
-            background: #e0f2fe;
-            border-left: 5px solid #0284c7;
-            border-radius: 6px;
-        }
-
-        /* ✅ NEW: Google Meet Button Style */
-        .meet-btn {
-            display: inline-block;
-            background: #dc2626;
-            color: white;
-            padding: 10px 16px;
-            border-radius: 8px;
-            text-decoration: none;
-            font-weight: 600;
-            transition: 0.3s;
-        }
-
-        .meet-btn:hover {
-            background: #b91c1c;
-        }
-    </style>
+    form {
+        width: 100%;
+    }
+}
+</style>
 </head>
 
 <body>
 
-<!-- Sidebar -->
-<div class="sidebar">
+<!-- SIDEBAR -->
+<div class="sidebar" id="sidebar">
     <h2>Medical System</h2>
 
     <a href="{% url 'home_view' %}">🏠 Home</a>
@@ -268,14 +176,15 @@
 
     <a href="{% url 'records:record_list' %}">📄 Records</a>
     <a href="{% url 'records:record_create' %}">➕ Add Record</a>
+
     <a href="{% url 'accounts:records_dashboard' %}">📊 Records Dashboard</a>
 
     <hr>
 
     {% if user.is_authenticated %}
-    <a href="{% url 'accounts:ai_symptom_checker' %}" style="background:#16a34a; color:white;">
-        🧠 AI Symptom Checker
-    </a>
+        <a href="{% url 'accounts:ai_symptom_checker' %}" style="color:white;background:#16a34a;">
+            🧠 AI Symptom Checker
+        </a>
     {% endif %}
 
     <hr>
@@ -285,75 +194,36 @@
     {% endif %}
 
     <hr>
+
     <a href="{% url 'about_view' %}">ℹ About</a>
 </div>
 
-<!-- Main -->
+<!-- MAIN -->
 <div class="main">
 
-    <!-- Navbar -->
+    <!-- NAVBAR -->
     <div class="navbar">
+
+        <span class="menu-btn" onclick="toggleSidebar()">☰</span>
+
         <h3>Hybrid Medical Consultancy</h3>
 
         <div class="user">
             {% if user.is_authenticated %}
-
-                <!-- Notifications -->
-                <div class="icon-box">
-                    🔔
-                    {% if unread_notifications_count > 0 %}
-                        <span class="badge">{{ unread_notifications_count }}</span>
-                    {% endif %}
-
-                    <div class="dropdown">
-                        {% for note in notifications %}
-                            <div>{{ note.title }}</div>
-                        {% empty %}
-                            <div>No notifications</div>
-                        {% endfor %}
-                    </div>
-                </div>
-
-                <!-- Messages -->
-                <div class="icon-box">
-                    💬
-                    {% if unread_messages_count > 0 %}
-                        <span class="badge">{{ unread_messages_count }}</span>
-                    {% endif %}
-
-                    <div class="dropdown">
-                        {% for msg in messages %}
-                            <div><strong>{{ msg.sender }}</strong>: {{ msg.subject }}</div>
-                        {% empty %}
-                            <div>No messages</div>
-                        {% endfor %}
-                    </div>
-                </div>
-
                 <span>👤 {{ user.username }}</span>
                 <a href="{% url 'accounts:logout' %}">Logout</a>
-
             {% else %}
                 <a href="{% url 'accounts:login' %}">Login</a>
-                <a href="{% url 'accounts:register' %}">Register</a>
             {% endif %}
         </div>
     </div>
 
-    <!-- Content -->
+    <!-- CONTENT -->
     <div class="content">
 
-        <!-- ✅ NEW: Django Messages Display -->
         {% if messages %}
             {% for message in messages %}
-                <div style="
-                    padding:12px;
-                    margin-bottom:15px;
-                    border-radius:6px;
-                    background:#d1fae5;
-                    color:#065f46;
-                    font-weight:600;
-                ">
+                <div style="padding:10px;background:#d1fae5;margin-bottom:10px;">
                     {{ message }}
                 </div>
             {% endfor %}
@@ -361,9 +231,15 @@
 
         {% block content %}
         {% endblock %}
-    </div>
 
+    </div>
 </div>
+
+<script>
+function toggleSidebar() {
+    document.getElementById("sidebar").classList.toggle("active");
+}
+</script>
 
 </body>
 </html>
