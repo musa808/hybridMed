@@ -1,165 +1,4 @@
 from django.shortcuts import render, redirect
-from django.contrib.auth import login, authenticate, logout
-from django.contrib.auth.forms import AuthenticationForm
-from django.contrib import messages
-from django.contrib.auth.decorators import login_required
-
-from .forms import UserRegisterForm, ProfileForm
-from .models import Profile
-
-
-# ================= REGISTER =================
-
-
-def register_view(request):
-    if request.method == 'POST':
-        user_form = UserRegisterForm(request.POST)
-        profile_form = ProfileForm(request.POST)
-
-        if user_form.is_valid() and profile_form.is_valid():
-            # Save the user
-            user = user_form.save()
-
-            # Save the profile
-            profile = profile_form.save(commit=False)
-            profile.user = user
-            profile.save()
-
-            messages.success(request, "Account created successfully!")
-            return redirect('accounts:login')
-        else:
-            # Debugging: print errors
-            print(user_form.errors)
-            print(profile_form.errors)
-
-    else:
-        user_form = UserRegisterForm()
-        profile_form = ProfileForm()
-
-    return render(request, 'accounts/register.html', {
-        'user_form': user_form,
-        'profile_form': profile_form
-    })
-# ================= LOGIN =================
-import random
-from django.core.mail import send_mail
-from django.contrib.auth.forms import AuthenticationForm
-from django.shortcuts import render, redirect
-
-def login_view(request):
-    if request.method == 'POST':
-        form = AuthenticationForm(request, data=request.POST)
-
-        if form.is_valid():
-            user = form.get_user()
-
-            # Generate OTP
-            otp = random.randint(100000, 999999)
-
-            # Store in session
-            request.session['otp'] = str(otp)
-            request.session['otp_user_id'] = user.id
-
-            # Send OTP (email)
-            send_mail(
-                'Your OTP Code',
-                f'Your OTP is {otp}',
-                'your@email.com',
-                [user.email],
-                fail_silently=False,
-            )
-
-            return redirect('accounts:verify_otp')
-
-    else:
-        form = AuthenticationForm()
-
-    return render(request, 'accounts/login.html', {'form': form})
-from django.contrib.auth import login
-from django.contrib.auth import get_user_model
-
-User = get_user_model()
-
-def verify_otp(request):
-    if request.method == 'POST':
-        entered_otp = request.POST.get('otp')
-        session_otp = request.session.get('otp')
-        user_id = request.session.get('otp_user_id')
-
-        if entered_otp == session_otp:
-            user = User.objects.get(id=user_id)
-            login(request, user)
-
-            # Clear session
-            request.session.pop('otp', None)
-            request.session.pop('otp_user_id', None)
-
-            # Role-based redirect
-            if user.is_staff:
-                return redirect('appointment:admin_dashboard')
-
-            if user.profile.role == "doctor":
-                return redirect('doctors:doctor_dashboard')
-
-            if user.profile.role == "patient":
-                return redirect('patients:patient_dashboard')
-
-            return redirect('home_view')
-
-        else:
-            return render(request, 'accounts/verify_otp.html', {'error': 'Invalid OTP'})
-
-    return render(request, 'accounts/verify_otp.html')
-import random
-from django.core.mail import send_mail
-from django.conf import settings
-
-def login_view(request):
-    if request.method == 'POST':
-        form = AuthenticationForm(request, data=request.POST)
-
-        if form.is_valid():
-            user = form.get_user()
-
-            # Generate OTP
-            otp = random.randint(100000, 999999)
-
-            # Store OTP in session
-            request.session['otp'] = str(otp)
-            request.session['otp_user_id'] = user.id
-
-            # Send email
-            send_mail(
-                'Your OTP Code',
-                f'Your OTP is: {otp}',
-                settings.EMAIL_HOST_USER,
-                [user.email],
-                fail_silently=False,
-            )
-
-            return redirect('accounts:verify_otp')
-
-    else:
-        form = AuthenticationForm()
-
-    return render(request, 'accounts/login.html', {'form': form})
-
-# ================= LOGOUT =================
-def logout_view(request):
-    logout(request)
-    return redirect('home_view')
-
-
-# ================= PROFILE =================
-@login_required
-def profile_view(request):
-    return render(request, 'accounts/profile.html')
-
-# views.p
-
-
-
-# ---------- Export to PDF ----------
 import pandas as pd
 from django.shortcuts import render, redirect
 from django.http import HttpResponse
@@ -691,9 +530,7 @@ def symptom_checker(request):
             result = "Symptoms unclear. Please consult a doctor."
 
     return render(request, "accounts/symptoms_form.html", {"result": result})
-def my_view(request):
-    message = _("Welcome to Medical System")
-    return HttpResponse(message)
+
 
 from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib import messages
@@ -934,31 +771,95 @@ def download_receipt(request, payment_id):
 
     return response
 
+# ================= IMPORTS =================
+from django.shortcuts import render, redirect, get_object_or_404, HttpResponse
+from django.contrib.auth import login, logout, get_user_model
+from django.contrib.auth.forms import AuthenticationForm
+from django.contrib.auth.decorators import login_required
+from django.contrib import messages
+from django.conf import settings
+
 from django.core.mail import send_mail
 from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
 from django.contrib.auth.tokens import default_token_generator
 from django.utils.encoding import force_bytes
 
+from datetime import datetime, timedelta
+import random
+import uuid
+import os
+import pandas as pd
+import stripe
+from PyPDF2 import PdfReader
+
+from reportlab.pdfgen import canvas
+from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Image
+from reportlab.lib.pagesizes import letter, A4
+from reportlab.lib.styles import getSampleStyleSheet
+from django.utils.timezone import localtime
+from django.db import transaction
+
+from openai import OpenAI
+
+# ================= MODELS =================
+from .forms import UserRegisterForm, ProfileForm, SymptomCheckerForm
+from .models import (
+    Profile, SymptomCheck, Payment, Consultation,
+    Appointment, Notification, Message, Receipt,
+    OnlineConsultation, Prescription
+)
+from consultations.models import Consultation
+
+# ================= INIT =================
+User = get_user_model()
+stripe.api_key = settings.STRIPE_SECRET_KEY
+client = OpenAI(api_key=settings.OPENAI_API_KEY)
+
+# ================= REGISTER =================
+def register_view(request):
+    if request.method == 'POST':
+        user_form = UserRegisterForm(request.POST)
+        profile_form = ProfileForm(request.POST)
+
+        if user_form.is_valid() and profile_form.is_valid():
+            user = user_form.save(commit=False)
+            user.is_active = False  # require email verification
+            user.save()
+
+            profile = profile_form.save(commit=False)
+            profile.user = user
+            profile.save()
+
+            send_verification_email(user, request)
+
+            messages.success(request, "Account created! Check your email.")
+            return redirect('accounts:login')
+
+    else:
+        user_form = UserRegisterForm()
+        profile_form = ProfileForm()
+
+    return render(request, 'accounts/register.html', {
+        'user_form': user_form,
+        'profile_form': profile_form
+    })
+
+
+# ================= EMAIL VERIFICATION =================
 def send_verification_email(user, request):
     uid = urlsafe_base64_encode(force_bytes(user.pk))
     token = default_token_generator.make_token(user)
 
-    verification_link = request.build_absolute_uri(
-        f"/accounts/verify/{uid}/{token}/"
-    )
+    link = request.build_absolute_uri(f"/accounts/verify/{uid}/{token}/")
 
     send_mail(
         "Verify your email",
-        f"Click this link to verify your account:\n{verification_link}",
-        "your_email@gmail.com",
+        f"Click to verify:\n{link}",
+        settings.EMAIL_HOST_USER,
         [user.email],
         fail_silently=False,
     )
 
-from django.contrib.auth.models import User
-from django.shortcuts import redirect, HttpResponse
-from django.utils.http import urlsafe_base64_decode
-from django.contrib.auth.tokens import default_token_generator
 
 def verify_email(request, uidb64, token):
     try:
@@ -971,29 +872,149 @@ def verify_email(request, uidb64, token):
         user.is_active = True
         user.save()
         return HttpResponse("Email verified successfully!")
+    return HttpResponse("Invalid or expired token")
+
+
+# ================= LOGIN + OTP =================
+def login_view(request):
+    if request.method == 'POST':
+        form = AuthenticationForm(request, data=request.POST)
+
+        if form.is_valid():
+            user = form.get_user()
+
+            if not user.is_active:
+                messages.error(request, "Verify your email first.")
+                return redirect('accounts:login')
+
+            otp = str(random.randint(100000, 999999))
+
+            request.session['otp'] = otp
+            request.session['otp_user_id'] = user.id
+            request.session['otp_expiry'] = (
+                datetime.now() + timedelta(minutes=5)
+            ).isoformat()
+
+            send_mail(
+                'Your OTP Code',
+                f'OTP: {otp} (expires in 5 minutes)',
+                settings.EMAIL_HOST_USER,
+                [user.email],
+                fail_silently=False,
+            )
+
+            return redirect('accounts:verify_otp')
+
     else:
-        return HttpResponse("Invalid or expired token")
+        form = AuthenticationForm()
 
-import random
-from django.core.mail import send_mail
-from django.shortcuts import redirect
+    return render(request, 'accounts/login.html', {'form': form})
+
+
+# ================= VERIFY OTP =================
+from django.shortcuts import render, redirect
 from django.contrib import messages
+from django.contrib.auth import login, get_user_model
+from django.utils import timezone
+from datetime import datetime
 
+User = get_user_model()
+
+from django.shortcuts import render, redirect
+from django.contrib import messages
+from django.contrib.auth import login, get_user_model
+from django.utils import timezone
+from datetime import datetime
+
+User = get_user_model()
+
+def verify_otp(request):
+    if request.method == 'POST':
+        entered = request.POST.get('otp')
+
+        otp = request.session.get('otp')
+        user_id = request.session.get('otp_user_id')
+        expiry = request.session.get('otp_expiry')
+
+        # 🔴 Check session data
+        if not otp or not user_id or not expiry:
+            messages.error(request, "Session expired. Please login again.")
+            return redirect('accounts:login')
+
+        # 🔴 Convert expiry to timezone-aware datetime
+        try:
+            expiry_dt = datetime.fromisoformat(expiry)
+
+            if timezone.is_naive(expiry_dt):
+                expiry_dt = timezone.make_aware(expiry_dt)
+
+        except Exception:
+            messages.error(request, "Invalid OTP expiry.")
+            return redirect('accounts:login')
+
+        # 🔴 Check expiry
+        if timezone.now() > expiry_dt:
+            messages.error(request, "OTP expired")
+            return redirect('accounts:login')
+
+        # 🔴 Verify OTP
+        if entered == otp:
+            try:
+                user = User.objects.get(id=user_id)
+            except User.DoesNotExist:
+                messages.error(request, "User not found.")
+                return redirect('accounts:login')
+
+            # ✅ Log user in
+            login(request, user)
+
+            # ✅ Clean ONLY OTP session data (DO NOT flush session)
+            request.session.pop('otp', None)
+            request.session.pop('otp_user_id', None)
+            request.session.pop('otp_expiry', None)
+
+            # ✅ Redirect based on role
+            if user.is_staff:
+                return redirect('appointment:admin_dashboard')
+            elif hasattr(user, 'profile') and user.profile.role == "doctor":
+                return redirect('doctors:doctor_dashboard')
+            elif hasattr(user, 'profile') and user.profile.role == "patient":
+                return redirect('patients:patient_dashboard')
+
+            return redirect('home_view')
+
+        else:
+            messages.error(request, "Invalid OTP")
+
+    return render(request, 'accounts/verify_otp.html')
 def resend_otp(request):
     if request.user.is_authenticated:
-        otp = random.randint(100000, 999999)
+        otp = str(random.randint(100000, 999999))
 
-        # Save OTP in session
-        request.session['otp'] = str(otp)
+        request.session['otp'] = otp
+        request.session['otp_expiry'] = (
+            datetime.now() + timedelta(minutes=5)
+        ).isoformat()
 
-        # Send email
         send_mail(
-            'Your OTP Code',
-            f'Your new OTP is: {otp}',
-            None,
+            'New OTP',
+            f'OTP: {otp}',
+            settings.EMAIL_HOST_USER,
             [request.user.email],
         )
 
-        messages.success(request, "A new OTP has been sent to your email.")
+        messages.success(request, "New OTP sent")
 
     return redirect('accounts:verify_otp')
+
+
+# ================= LOGOUT =================
+def logout_view(request):
+    logout(request)
+    return redirect('home_view')
+
+
+# ================= PROFILE =================
+@login_required
+def profile_view(request):
+    return render(request, 'accounts/profile.html')
